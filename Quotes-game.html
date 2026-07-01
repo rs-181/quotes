@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quotes of Legends The Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-dark: #8a6c28;
+    --ink: #0d0b0a;
+    --parchment: #f5ede0;
+    --cream: #fdf8f0;
+    --charcoal: #1a1614;
+    --mist: #2d2520;
+    --correct: #2d6a4f;
+    --correct-light: #40916c;
+    --wrong: #8b1a1a;
+    --wrong-light: #c1272d;
+    --text-primary: #1a1614;
+    --text-muted: #6b5d50;
+    --border: rgba(201,168,76,0.25);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    color: var(--parchment);
+  }
+
+  /* Ambient Background */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 20%, rgba(201,168,76,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 60% at 80% 80%, rgba(139,107,42,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 80% at 50% 50%, #120f0c 0%, #0a0807 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Grain overlay */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem 4rem;
+  }
+
+  /* Header */
+  .site-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .ornament {
+    display: block;
+    font-size: 1rem;
+    color: var(--gold);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+    opacity: 0.8;
+  }
+
+  .site-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 6vw, 3.8rem);
+    font-weight: 900;
+    color: var(--gold-light);
+    text-shadow:
+      0 0 60px rgba(201,168,76,0.3),
+      0 2px 4px rgba(0,0,0,0.6);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+
+  .site-subtitle {
+    font-size: 0.8rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+    margin-top: 0.5rem;
+    font-weight: 500;
+  }
+
+  /* Divider */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto 2rem;
+    animation: fadeIn 1s ease 0.3s both;
+  }
+
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dark), transparent);
+  }
+
+  .divider-gem {
+    width: 8px; height: 8px;
+    background: var(--gold);
+    transform: rotate(45deg);
+    box-shadow: 0 0 8px var(--gold);
+  }
+
+  /* Card */
+  .card {
+    background: rgba(26,18,12,0.85);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 640px;
+    box-shadow:
+      0 0 0 1px rgba(201,168,76,0.08),
+      0 30px 80px rgba(0,0,0,0.7),
+      inset 0 1px 0 rgba(201,168,76,0.1);
+    backdrop-filter: blur(8px);
+    animation: slideUp 0.6s cubic-bezier(0.22,1,0.36,1) both;
+  }
+
+  /* Intro screen */
+  #intro-screen {
+    text-align: center;
+  }
+
+  .intro-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+    margin-bottom: 1.2rem;
+    font-weight: 500;
+  }
+
+  .intro-quote {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    font-style: italic;
+    color: var(--parchment);
+    line-height: 1.7;
+    position: relative;
+    padding: 0 1.5rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .intro-quote::before {
+    content: '\201C';
+    position: absolute;
+    left: 0; top: -0.3em;
+    font-size: 3rem;
+    color: var(--gold);
+    font-style: normal;
+    line-height: 1;
+    opacity: 0.6;
+  }
+
+  .intro-author {
+    font-size: 0.8rem;
+    color: var(--gold);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 2.5rem;
+  }
+
+  .btn-start {
+    display: inline-block;
+    padding: 0.9rem 3rem;
+    background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold) 50%, var(--gold-dark) 100%);
+    background-size: 200% auto;
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    border-radius: 2px;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.3), 0 0 0 1px rgba(201,168,76,0.3);
+    transition: background-position 0.4s, transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-start:hover {
+    background-position: right center;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(201,168,76,0.5), 0 0 0 1px rgba(201,168,76,0.5);
+  }
+
+  .btn-start:active { transform: translateY(0); }
+
+  /* Quiz screen */
+  #quiz-screen { display: none; }
+
+  .quiz-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+    font-weight: 500;
+  }
+
+  .progress-bar-wrap {
+    width: 100%;
+    height: 2px;
+    background: rgba(201,168,76,0.12);
+    border-radius: 1px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold));
+    border-radius: 1px;
+    transition: width 0.5s cubic-bezier(0.22,1,0.36,1);
+    box-shadow: 0 0 8px rgba(201,168,76,0.6);
+  }
+
+  .quote-block {
+    margin-bottom: 2rem;
+    animation: fadeIn 0.4s ease both;
+  }
+
+  .quote-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.1rem, 2.8vw, 1.45rem);
+    font-style: italic;
+    color: var(--parchment);
+    line-height: 1.75;
+    position: relative;
+    padding-left: 2rem;
+    border-left: 2px solid rgba(201,168,76,0.3);
+  }
+
+  .quote-text::before {
+    content: '\201C';
+    position: absolute;
+    left: 0.1rem; top: -0.5rem;
+    font-size: 2.5rem;
+    color: var(--gold);
+    font-style: normal;
+    line-height: 1;
+    opacity: 0.5;
+  }
+
+  .options-grid {
+    display: grid;
+    gap: 0.75rem;
+    animation: fadeIn 0.4s ease 0.1s both;
+  }
+
+  .option-btn {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    padding: 0.9rem 1.2rem;
+    background: rgba(201,168,76,0.04);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 3px;
+    color: var(--parchment);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 400;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option-letter {
+    min-width: 28px; height: 28px;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--gold-dark);
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    background: rgba(201,168,76,0.1);
+    border-color: rgba(201,168,76,0.4);
+    transform: translateX(4px);
+  }
+
+  .option-btn:hover:not(:disabled) .option-letter {
+    background: rgba(201,168,76,0.2);
+    color: var(--gold-light);
+  }
+
+  .option-btn:disabled { cursor: default; }
+
+  .option-btn.correct {
+    background: rgba(45,106,79,0.25);
+    border-color: var(--correct-light);
+    color: #a7f3cc;
+  }
+
+  .option-btn.correct .option-letter {
+    background: var(--correct);
+    border-color: var(--correct-light);
+    color: #fff;
+  }
+
+  .option-btn.wrong {
+    background: rgba(139,26,26,0.2);
+    border-color: var(--wrong-light);
+    color: #fca5a5;
+    animation: shake 0.35s ease;
+  }
+
+  .option-btn.wrong .option-letter {
+    background: var(--wrong);
+    border-color: var(--wrong-light);
+    color: #fff;
+  }
+
+  .option-btn.dimmed {
+    opacity: 0.35;
+  }
+
+  /* Result screen */
+  #result-screen {
+    display: none;
+    text-align: center;
+  }
+
+  .result-badge {
+    width: 100px; height: 100px;
+    margin: 0 auto 1.5rem;
+    border-radius: 50%;
+    border: 2px solid var(--gold-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    background: rgba(201,168,76,0.06);
+    box-shadow: 0 0 30px rgba(201,168,76,0.15), inset 0 0 30px rgba(201,168,76,0.05);
+    animation: popIn 0.5s cubic-bezier(0.22,1,0.36,1) both;
+  }
+
+  .result-score {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    font-weight: 900;
+    color: var(--gold-light);
+    text-shadow: 0 0 40px rgba(201,168,76,0.4);
+    animation: popIn 0.6s cubic-bezier(0.22,1,0.36,1) 0.1s both;
+    line-height: 1;
+  }
+
+  .result-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+    margin: 0.4rem 0 1rem;
+    font-weight: 500;
+  }
+
+  .result-message {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    font-style: italic;
+    color: var(--parchment);
+    opacity: 0.85;
+    margin-bottom: 2rem;
+    animation: fadeIn 0.6s ease 0.3s both;
+    line-height: 1.6;
+  }
+
+  .btn-replay {
+    display: inline-block;
+    padding: 0.9rem 2.5rem;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-dark));
+    background-size: 200% auto;
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    border-radius: 2px;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.3);
+    transition: background-position 0.4s, transform 0.2s, box-shadow 0.2s;
+    font-family: 'DM Sans', sans-serif;
+    margin-bottom: 1.5rem;
+  }
+
+  .btn-replay:hover {
+    background-position: right center;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(201,168,76,0.5);
+  }
+
+  .explore-link {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.78rem;
+    color: var(--gold-dark);
+    text-decoration: none;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .explore-link:hover {
+    color: var(--gold-light);
+  }
+
+  .explore-link span {
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 1px;
+  }
+          .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-tertiary);
+            font-size: 0.8rem;
+            letter-spacing: 0.02em;
+            width: 100%;
+            max-width: var(--max-width);
+            border-top: 1px solid var(--divider);
+            margin-top: 20px;
+        }
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.75); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+  }
+
+  /* Hide/show utility */
+  .hidden { display: none !important; }
+
+  @media (max-width: 480px) {
+    .card { padding: 2rem 1.4rem; }
+    .quote-text { font-size: 1.05rem; padding-left: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <header class="site-header">
+    <span class="ornament">✦ &nbsp; &nbsp; ✦ &nbsp; &nbsp; ✦</span>
+    <h1 class="site-title">Quotes of Legends The Game</h1>
+    <p class="site-subtitle">Identify the voice behind the wisdom</p>
+  </header>
+
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-gem"></div>
+    <div class="divider-line"></div>
+  </div>
+
+  <div class="card" id="main-card">
+
+    <!-- Intro Screen -->
+    <div id="intro-screen">
+      <p class="intro-label">Today's Wisdom</p>
+      <p class="intro-quote" id="splash-quote"></p>
+      <p class="intro-author" id="splash-author"></p>
+      <button class="btn-start" onclick="startQuiz()">Begin the Quest</button>
+    </div>
+        <!-- Footer -->
+    <footer class="footer">
+      <a href="https://rehan-sandhi.blogspot.com/2026/02/my-license.html">Website license</a>
+      <br>
+        <span>Quotes of Legends &copy; 2026 — ALL RIGHTS RESERVED</span>
+    </footer>
+
+    <!-- Quiz Screen -->
+    <div id="quiz-screen">
+      <div class="quiz-meta">
+        <span id="q-counter">Question 1 / 10</span>
+        <span id="q-score">Score: 0</span>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progress-fill" style="width:10%"></div>
+      </div>
+      <div class="quote-block">
+        <p class="quote-text" id="quiz-quote"></p>
+      </div>
+      <div class="options-grid" id="options-container"></div>
+    </div>
+    
+
+    <!-- Result Screen -->
+    <div id="result-screen">
+      <div class="result-badge" id="result-emoji"></div>
+      <div class="result-score" id="result-score-text"></div>
+      <p class="result-label">Final Score</p>
+      <p class="result-message" id="result-message"></p>
+      <button class="btn-replay" onclick="resetQuiz()">Play Again</button>
+      <a href="index.html" target="_blank" class="explore-link">
+        <span>Explore More Quotes →</span>
+      </a>
+    </div>
+  </div>
+</div>
+<script>
+const ALL_QUESTIONS = [
+  { q: "Be the change that you wish to see in the world.", o: ["Mahatma Gandhi","Nelson Mandela","Martin Luther King Jr.","Dalai Lama"], a: 0 },
+  { q: "Imagination is more important than knowledge.", o: ["Albert Einstein","Isaac Newton","Nikola Tesla","Galileo Galilei"], a: 0 },
+  { q: "Arise, awake and stop not till the goal is reached.", o: ["Swami Vivekananda","Rabindranath Tagore","Mahatma Gandhi","Sri Aurobindo"], a: 0 },
+  { q: "That which does not kill us makes us stronger.", o: ["Friedrich Nietzsche","Karl Marx","Arthur Schopenhauer","Søren Kierkegaard"], a: 0 },
+  { q: "Ask not what your country can do for you — ask what you can do for your country.", o: ["John F. Kennedy","Abraham Lincoln","Winston Churchill","Franklin D. Roosevelt"], a: 0 },
+  { q: "Life is like riding a bicycle. To keep your balance you must keep moving.", o: ["Albert Einstein","Leonardo da Vinci","Isaac Newton","Thomas Edison"], a: 0 },
+  { q: "The mind is everything. What you think you become.", o: ["Gautama Buddha","Confucius","Lao Tzu","Dalai Lama"], a: 0 },
+  { q: "A day without laughter is a day wasted.", o: ["Charlie Chaplin","Buster Keaton","Jim Carrey","Rowan Atkinson"], a: 0 },
+  { q: "Dream is not that which you see while sleeping — it is something that does not let you sleep.", o: ["APJ Abdul Kalam","Vikram Sarabhai","Homi Bhabha","Ratan Tata"], a: 0 },
+  { q: "Be yourself; everyone else is already taken.", o: ["Oscar Wilde","Mark Twain","George Bernard Shaw","Charles Dickens"], a: 0 },
+  { q: "The revolution is not an apple that falls when it is ripe. You have to make it fall.", o: ["Che Guevara","Fidel Castro","Karl Marx","Vladimir Lenin"], a: 0 },
+  { q: "Knowledge makes us critical, and being critical makes us revolutionary.", o: ["Che Guevara","Mao Zedong","Leon Trotsky","Ho Chi Minh"], a: 0 },
+  { q: "Silence is argument carried on by other means.", o: ["Che Guevara","Friedrich Nietzsche","Sun Tzu","Marcus Aurelius"], a: 0 },
+  { q: "Words that do not match deeds are unimportant.", o: ["Che Guevara","Mahatma Gandhi","Nelson Mandela","Karl Marx"], a: 0 },
+  { q: "We have no right to believe that freedom can be won without struggle.", o: ["Che Guevara","Subhas Chandra Bose","Bhagat Singh","Vladimir Lenin"], a: 0 },
+  { q: "God has no religion.", o: ["Mahatma Gandhi","Swami Vivekananda","Dalai Lama","Rabindranath Tagore"], a: 0 },
+  { q: "I will not let anyone walk through my mind with their dirty feet.", o: ["Mahatma Gandhi","Martin Luther King Jr.","Nelson Mandela","Mother Teresa"], a: 0 },
+  { q: "There are people in the world so hungry, that God cannot appear to them except in the form of bread.", o: ["Mahatma Gandhi","Mother Teresa","Pope Francis","Dalai Lama"], a: 0 },
+  { q: "Education is the milk of a lioness — whoever drinks it will roar.", o: ["B. R. Ambedkar","Jyotiba Phule","Periyar","Savitribai Phule"], a: 0 },
+  { q: "Life should be great rather than long.", o: ["B. R. Ambedkar","Aristotle","Socrates","Plato"], a: 0 },
+  { q: "I measure the progress of a community by the degree of progress which women have achieved.", o: ["B. R. Ambedkar","Mahatma Gandhi","Indira Gandhi","Sarojini Naidu"], a: 0 },
+  { q: "Be educated, be organized and be agitated.", o: ["B. R. Ambedkar","Karl Marx","Vladimir Lenin","Jyotiba Phule"], a: 0 },
+  { q: "Religion is for man, not man for religion.", o: ["B. R. Ambedkar","Swami Vivekananda","Mahatma Gandhi","Rabindranath Tagore"], a: 0 },
+  { q: "Lost rights are never regained by begging and by prayers but by organized and determined struggle.", o: ["B. R. Ambedkar","Bhagat Singh","Subhas Chandra Bose","Karl Marx"], a: 0 },
+  { q: "Cultivation of mind should be the ultimate aim of human existence.", o: ["B. R. Ambedkar","Aristotle","Plato","Socrates"], a: 0 },
+  { q: "In the end, it's not the years in your life that count. It's the life in your years.", o: ["Abraham Lincoln","Mark Twain","Benjamin Franklin","Theodore Roosevelt"], a: 0 },
+  { q: "Give me six hours to chop down a tree and I will spend the first four sharpening the axe.", o: ["Abraham Lincoln","Thomas Jefferson","George Washington","Andrew Jackson"], a: 0 },
+  { q: "My concern is not whether God is on our side; my greatest concern is to be on God's side.", o: ["Abraham Lincoln","Winston Churchill","Franklin D. Roosevelt","Woodrow Wilson"], a: 0 },
+  { q: "No man has a good enough memory to be a successful liar.", o: ["Abraham Lincoln","Mark Twain","Oscar Wilde","George Bernard Shaw"], a: 0 },
+  { q: "The ballot is stronger than the bullet.", o: ["Abraham Lincoln","John F. Kennedy","Martin Luther King Jr.","Nelson Mandela"], a: 0 },
+  { q: "Do not pray for an easy life; pray for the strength to endure a difficult one.", o: ["Bruce Lee","Jackie Chan","Jet Li","Chuck Norris"], a: 0 },
+  { q: "Be like water making its way through cracks.", o: ["Bruce Lee","Lao Tzu","Sun Tzu","Confucius"], a: 0 },
+  { q: "Knowing is not enough, we must apply. Willing is not enough, we must do.", o: ["Bruce Lee","Leonardo da Vinci","Aristotle","Socrates"], a: 0 },
+  { q: "Mistakes are always forgivable, if one has the courage to admit them.", o: ["Bruce Lee","Mahatma Gandhi","Nelson Mandela","Dalai Lama"], a: 0 },
+  { q: "Empty your mind, be formless, shapeless — like water.", o: ["Bruce Lee","Lao Tzu","Sun Tzu","Confucius"], a: 0 },
+  { q: "The greatest sin is to think yourself weak.", o: ["Swami Vivekananda","Mahatma Gandhi","Rabindranath Tagore","Sri Aurobindo"], a: 0 },
+  { q: "We are what our thoughts have made us; so take care about what you think.", o: ["Swami Vivekananda","Gautama Buddha","Confucius","Lao Tzu"], a: 0 },
+  { q: "The world is the great gymnasium where we come to make ourselves strong.", o: ["Swami Vivekananda","Aristotle","Plato","Socrates"], a: 0 },
+  { q: "Comfort is no test of truth. Truth is often far from being comfortable.", o: ["Swami Vivekananda","Friedrich Nietzsche","Karl Marx","Arthur Schopenhauer"], a: 0 },
+  { q: "Truth can be stated in a thousand different ways, yet each one can be true.", o: ["Swami Vivekananda","Confucius","Lao Tzu","Socrates"], a: 0 },
+  { q: "You have to dream before your dreams can come true.", o: ["APJ Abdul Kalam","Vikram Sarabhai","Homi Bhabha","Ratan Tata"], a: 0 },
+  { q: "Man needs his difficulties because they are necessary to enjoy success.", o: ["APJ Abdul Kalam","Albert Einstein","Thomas Edison","Nikola Tesla"], a: 0 },
+  { q: "If you want to shine like a sun, first burn like a sun.", o: ["APJ Abdul Kalam","Swami Vivekananda","Mahatma Gandhi","Rabindranath Tagore"], a: 0 },
+  { q: "Excellence is a continuous process and not an accident.", o: ["APJ Abdul Kalam","Aristotle","Leonardo da Vinci","Steve Jobs"], a: 0 },
+  { q: "Without your involvement you can't succeed; with your involvement you can't fail.", o: ["APJ Abdul Kalam","Bill Gates","Steve Jobs","Elon Musk"], a: 0 },
+  { q: "I don't believe in taking right decisions. I take decisions and then make them right.", o: ["Ratan Tata","Mukesh Ambani","Narayana Murthy","Azim Premji"], a: 0 },
+  { q: "Ups and downs in life are very important to keep us going, because a straight line even in an ECG means we are not alive.", o: ["Ratan Tata","APJ Abdul Kalam","Steve Jobs","Bill Gates"], a: 0 },
+  { q: "None can destroy iron, but its own rust can. Likewise none can destroy a person, but their own mindset can.", o: ["Ratan Tata","Mahatma Gandhi","Swami Vivekananda","Chanakya"], a: 0 },
+  { q: "Teamwork is critical; there is no substitute for the best team.", o: ["Ratan Tata","Steve Jobs","Bill Gates","Elon Musk"], a: 0 },
+  { q: "Take the stones people throw at you and use them to build a monument.", o: ["Ratan Tata","Sachin Tendulkar","MS Dhoni","Virat Kohli"], a: 0 },
+  { q: "Anyone who has never made a mistake has never tried anything new.", o: ["Albert Einstein","Isaac Newton","Nikola Tesla","Galileo Galilei"], a: 0 },
+  { q: "In the middle of every difficulty lies opportunity.", o: ["Albert Einstein","Winston Churchill","Franklin D. Roosevelt","Theodore Roosevelt"], a: 0 },
+  { q: "Logic will get you from A to Z; imagination will get you everywhere.", o: ["Albert Einstein","Nikola Tesla","Isaac Newton","Stephen Hawking"], a: 0 },
+  { q: "Try not to become a man of success but rather try to become a man of value.", o: ["Albert Einstein","Aristotle","Socrates","Plato"], a: 0 },
+  { q: "If you can't explain it simply, you don't understand it well enough.", o: ["Albert Einstein","Richard Feynman","Stephen Hawking","Niels Bohr"], a: 0 },
+  { q: "It does not matter how slowly you go as long as you do not stop.", o: ["Confucius","Lao Tzu","Sun Tzu","Mencius"], a: 0 },
+  { q: "The man who moves a mountain begins by carrying away small stones.", o: ["Confucius","Lao Tzu","Sun Tzu","Mencius"], a: 0 },
+  { q: "Before you embark on a journey of revenge, dig two graves.", o: ["Confucius","Sun Tzu","Lao Tzu","Mencius"], a: 0 },
+  { q: "Life is really simple, but we insist on making it complicated.", o: ["Confucius","Lao Tzu","Buddha","Mencius"], a: 0 },
+  { q: "Real knowledge is to know the extent of one's ignorance.", o: ["Confucius","Socrates","Plato","Aristotle"], a: 0 },
+  { q: "Three things cannot be long hidden: the sun, the moon, and the truth.", o: ["Gautama Buddha","Confucius","Lao Tzu","Dalai Lama"], a: 0 },
+  { q: "Peace comes from within. Do not seek it without.", o: ["Gautama Buddha","Mahatma Gandhi","Dalai Lama","Confucius"], a: 0 },
+  { q: "The root of suffering is attachment.", o: ["Gautama Buddha","Lao Tzu","Confucius","Dalai Lama"], a: 0 },
+  { q: "You yourself, as much as anybody in the entire universe, deserve your love and affection.", o: ["Gautama Buddha","Dalai Lama","Thich Nhat Hanh","Confucius"], a: 0 },
+  { q: "It is better to conquer yourself than to win a thousand battles.", o: ["Gautama Buddha","Sun Tzu","Confucius","Lao Tzu"], a: 0 },
+  { q: "There is nothing impossible to him who will try.", o: ["Alexander the Great","Julius Caesar","Napoleon Bonaparte","Hannibal Barca"], a: 0 },
+  { q: "I am not afraid of an army of lions led by a sheep; I am afraid of an army of sheep led by a lion.", o: ["Alexander the Great","Napoleon Bonaparte","Julius Caesar","Sun Tzu"], a: 0 },
+  { q: "Heaven cannot brook two suns, nor earth two masters.", o: ["Alexander the Great","Julius Caesar","Napoleon Bonaparte","Sun Tzu"], a: 0 },
+  { q: "I would rather live a short life of glory than a long life of obscurity.", o: ["Alexander the Great","Julius Caesar","Achilles","Napoleon Bonaparte"], a: 0 },
+  { q: "A tomb now suffices him for whom the whole world was not sufficient.", o: ["Alexander the Great","Napoleon Bonaparte","Julius Caesar","Marcus Aurelius"], a: 0 },
+  { q: "If you want to find the secrets of the universe, think in terms of energy, frequency and vibration.", o: ["Nikola Tesla","Albert Einstein","Isaac Newton","James Clerk Maxwell"], a: 0 },
+  { q: "Be alone — that is the secret of invention. Be alone — that is when ideas are born.", o: ["Nikola Tesla","Thomas Edison","Albert Einstein","Leonardo da Vinci"], a: 0 },
+  { q: "I do not care that they stole my idea. I care that they do not have any of their own.", o: ["Nikola Tesla","Thomas Edison","Alexander Graham Bell","Nikolaus Otto"], a: 0 },
+  { q: "My brain is only a receiver. In the universe there is a core from which we obtain knowledge, strength and inspiration.", o: ["Nikola Tesla","Albert Einstein","Carl Jung","Sigmund Freud"], a: 0 },
+  { q: "Life is and will ever remain an equation incapable of solution, but it contains certain known factors.", o: ["Nikola Tesla","Albert Einstein","Stephen Hawking","Niels Bohr"], a: 0 },
+  { q: "We know what we are, but know not what we may be.", o: ["William Shakespeare","John Milton","Christopher Marlowe","Geoffrey Chaucer"], a: 0 },
+  { q: "The course of true love never did run smooth.", o: ["William Shakespeare","Jane Austen","Charles Dickens","Oscar Wilde"], a: 0 },
+  { q: "Cowards die many times before their deaths; the valiant never taste of death but once.", o: ["William Shakespeare","Homer","Virgil","Sophocles"], a: 0 },
+  { q: "There is nothing either good or bad, but thinking makes it so.", o: ["William Shakespeare","Friedrich Nietzsche","Arthur Schopenhauer","Søren Kierkegaard"], a: 0 },
+  { q: "The quality of mercy is not strained; it droppeth as the gentle rain from heaven.", o: ["William Shakespeare","John Milton","Geoffrey Chaucer","Christopher Marlowe"], a: 0 },
+  { q: "Unity in diversity is India's strength.", o: ["Sardar Vallabhbhai Patel","Jawaharlal Nehru","Mahatma Gandhi","Subhas Chandra Bose"], a: 0 },
+  { q: "Power without discipline is destructive.", o: ["Sardar Vallabhbhai Patel","B. R. Ambedkar","Mahatma Gandhi","Jawaharlal Nehru"], a: 0 },
+  { q: "A true servant of the people never seeks personal glory.", o: ["Sardar Vallabhbhai Patel","Lal Bahadur Shastri","Mahatma Gandhi","Subhas Chandra Bose"], a: 0 },
+  { q: "Anger is the enemy of non-violence and pride is a monster that swallows it up.", o: ["Sardar Vallabhbhai Patel","Mahatma Gandhi","Swami Vivekananda","Rabindranath Tagore"], a: 0 },
+  { q: "One who is the servant of all is the master of all.", o: ["Sardar Vallabhbhai Patel","B. R. Ambedkar","Mahatma Gandhi","Jawaharlal Nehru"], a: 0 },
+  { q: "You have power over your mind, not outside events. Realize this, and you will find strength.", o: ["Marcus Aurelius","Seneca","Epictetus","Plato"], a: 0 },
+  { q: "The happiness of your life depends upon the quality of your thoughts.", o: ["Marcus Aurelius","Epictetus","Seneca","Aristotle"], a: 0 },
+  { q: "Waste no more time arguing about what a good man should be. Be one.", o: ["Marcus Aurelius","Socrates","Plato","Aristotle"], a: 0 },
+  { q: "The best revenge is to be unlike him who performed the injury.", o: ["Marcus Aurelius","Seneca","Epictetus","Plato"], a: 0 },
+  { q: "Very little is needed to make a happy life; it is all within yourself, in your way of thinking.", o: ["Marcus Aurelius","Epictetus","Seneca","Aristotle"], a: 0 },
+  { q: "A book must be the axe for the frozen sea within us.", o: ["Franz Kafka","Fyodor Dostoevsky","Leo Tolstoy","Albert Camus"], a: 0 },
+  { q: "I am free and that is why I am lost.", o: ["Franz Kafka","Jean-Paul Sartre","Albert Camus","Friedrich Nietzsche"], a: 0 },
+  { q: "There is infinite hope, but not for us.", o: ["Franz Kafka","Samuel Beckett","Albert Camus","Jean-Paul Sartre"], a: 0 },
+  { q: "In the fight between you and the world, back the world.", o: ["Franz Kafka","Friedrich Nietzsche","Arthur Schopenhauer","Jean-Paul Sartre"], a: 0 },
+  { q: "A non-writing writer is a monster courting insanity.", o: ["Franz Kafka","Ernest Hemingway","George Orwell","Virginia Woolf"], a: 0 },
+  { q: "You can't cross the sea merely by standing and staring at the water.", o: ["Rabindranath Tagore","Mahatma Gandhi","Swami Vivekananda","Sri Aurobindo"], a: 0 },
+  { q: "Faith is the bird that feels the light when the dawn is still dark.", o: ["Rabindranath Tagore","Khalil Gibran","Rumi","Paulo Coelho"], a: 0 },
+  { q: "Let your life lightly dance on the edges of time like dew on the tip of a leaf.", o: ["Rabindranath Tagore","Rumi","Khalil Gibran","Pablo Neruda"], a: 0 },
+  { q: "We read the world wrong and say that it deceives us.", o: ["Rabindranath Tagore","Friedrich Nietzsche","Albert Camus","Jean-Paul Sartre"], a: 0 },
+  { q: "Beauty is truth's smile when she beholds her own face in a perfect mirror.", o: ["Rabindranath Tagore","John Keats","William Wordsworth","Percy Bysshe Shelley"], a: 0 },
+];
+
+const LETTERS = ['A','B','C','D'];
+
+let gameQuestions = [];
+let currentIndex = 0;
+let score = 0;
+let answered = false;
+
+// Pick a random splash quote on load
+(function initSplash() {
+  const q = ALL_QUESTIONS[Math.floor(Math.random() * ALL_QUESTIONS.length)];
+  document.getElementById('splash-quote').textContent = q.q;
+  document.getElementById('splash-author').textContent = '— ' + q.o[q.a];
+})();
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz() {
+  gameQuestions = shuffle(ALL_QUESTIONS).slice(0, 10);
+  currentIndex = 0;
+  score = 0;
+  answered = false;
+
+  document.getElementById('intro-screen').style.display = 'none';
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = gameQuestions[currentIndex];
+  const num = currentIndex + 1;
+
+  document.getElementById('q-counter').textContent = `Question ${num} / 10`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('progress-fill').style.width = `${num * 10}%`;
+  document.getElementById('quiz-quote').textContent = q.q;
+
+  const container = document.getElementById('options-container');
+  container.innerHTML = '';
+
+  // Shuffle options while tracking correct answer
+  const indexed = q.o.map((text, i) => ({ text, isCorrect: i === q.a }));
+  const shuffled = shuffle(indexed);
+
+  shuffled.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.dataset.correct = opt.isCorrect;
+    btn.innerHTML = `<span class="option-letter">${LETTERS[i]}</span> ${opt.text}`;
+    btn.onclick = () => handleAnswer(btn);
+    container.appendChild(btn);
+  });
+}
+
+function handleAnswer(btn) {
+  if (answered) return;
+  answered = true;
+
+  const allBtns = document.querySelectorAll('.option-btn');
+  const isCorrect = btn.dataset.correct === 'true';
+
+  allBtns.forEach(b => {
+    b.disabled = true;
+    if (b.dataset.correct === 'true') {
+      b.classList.add('correct');
+    } else if (b === btn && !isCorrect) {
+      b.classList.add('wrong');
+    } else {
+      b.classList.add('dimmed');
+    }
+  });
+
+  if (isCorrect) score++;
+
+  setTimeout(() => {
+    currentIndex++;
+    if (currentIndex < 10) {
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  }, 1100);
+}
+
+function showResult() {
+  document.getElementById('quiz-screen').style.display = 'none';
+  const rs = document.getElementById('result-screen');
+  rs.style.display = 'block';
+
+  document.getElementById('result-score-text').textContent = `${score} / 10`;
+
+  let emoji, msg;
+  if (score <= 3) {
+    emoji = '📜'; msg = 'Every legend started as a student. Keep seeking wisdom.';
+  } else if (score <= 6) {
+    emoji = '🏛️'; msg = 'A promising scholar of legends. Keep learning.';
+  } else if (score <= 8) {
+    emoji = '✨'; msg = 'You walk among the wise. Impressive knowledge!';
+  } else {
+    emoji = '🔥'; msg = 'Legend Level! You truly know the voices of history.';
+  }
+
+  document.getElementById('result-emoji').textContent = emoji;
+  document.getElementById('result-message').textContent = msg;
+}
+
+function resetQuiz() {
+  document.getElementById('result-screen').style.display = 'none';
+  startQuiz();
+}
+</script>
+<!-- Footnote Section -->
+<div class="footnote" style="font-family: 'Fira Code', monospace; margin-top: 3.5rem; margin-bottom: 5.5rem; font-size: 0.75rem; color: #475569; text-align: center;">
+  <span>✦ navigate beyond the familiar ✦</span>
+</div>
+
+<!-- Fixed Premium Floating Social Dock -->
+<div class="bottom-dock" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 400px; background: rgba(12, 5, 23, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(139, 92, 246, 0.25); border-radius: 16px; padding: 0.6rem 1.5rem; display: flex; align-items: center; justify-content: space-around; box-shadow: 0 20px 40px rgba(0,0,0,0.7); z-index: 9999;">
+  
+  <!-- Call Item -->
+  <a href="tel:+919725936153" 
+     style="color: #64748b; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.7rem; font-family: 'Fira Code', monospace; transition: all 0.3s;"
+     onmouseover="this.style.color='#ffffff'; this.querySelector('i').style.color='#38bdf8'; this.querySelector('i').style.textShadow='0 0 10px #38bdf8'; this.querySelector('i').style.transform='translateY(-2px)';"
+     onmouseout="this.style.color='#64748b'; this.querySelector('i').style.color='#64748b'; this.querySelector('i').style.textShadow='none'; this.querySelector('i').style.transform='translateY(0)';">
+    <i class="fas fa-phone" style="font-size: 1.15rem; color: #64748b; transition: all 0.2s;"></i>
+    <span>Call</span>
+  </a>
+  
+  <!-- WhatsApp Item -->
+  <a href="https://wa.me/919725936153" target="_blank" 
+     style="color: #64748b; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.7rem; font-family: 'Fira Code', monospace; transition: all 0.3s;"
+     onmouseover="this.style.color='#ffffff'; this.querySelector('i').style.color='#22c55e'; this.querySelector('i').style.textShadow='0 0 10px #22c55e'; this.querySelector('i').style.transform='translateY(-2px)';"
+     onmouseout="this.style.color='#64748b'; this.querySelector('i').style.color='#64748b'; this.querySelector('i').style.textShadow='none'; this.querySelector('i').style.transform='translateY(0)';">
+    <i class="fab fa-whatsapp" style="font-size: 1.15rem; color: #64748b; transition: all 0.2s;"></i>
+    <span>WhatsApp</span>
+  </a>
+  
+  <!-- Instagram Item -->
+  <a href="https://instagram.com/rehan_sandhi_181" target="_blank" 
+     style="color: #64748b; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.7rem; font-family: 'Fira Code', monospace; transition: all 0.3s;"
+     onmouseover="this.style.color='#ffffff'; this.querySelector('i').style.color='#ff007f'; this.querySelector('i').style.textShadow='0 0 10px #ff007f'; this.querySelector('i').style.transform='translateY(-2px)';"
+     onmouseout="this.style.color='#64748b'; this.querySelector('i').style.color='#64748b'; this.querySelector('i').style.textShadow='none'; this.querySelector('i').style.transform='translateY(0)';">
+    <i class="fab fa-instagram" style="font-size: 1.15rem; color: #64748b; transition: all 0.2s;"></i>
+    <span>Instagram</span>
+  </a>
+
+</div>
+
+
+</body>
+</html>
